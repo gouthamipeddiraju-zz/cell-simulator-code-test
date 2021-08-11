@@ -123,7 +123,7 @@ const Cells: FunctionComponent = () => {
     };
 
     const runIteration = () => {
-        setState({ ...state, isRunning: true });
+        setState({ ...state, board: getBoardData(), isRunning: true });
 
         let newBoard = getBoardData();
 
@@ -143,12 +143,9 @@ const Cells: FunctionComponent = () => {
                 }
             }
         }
-
         setState({
             ...state, isRunning: true, board: newBoard, cells: makeCells(newBoard)
         });
-        console.log(interval)
-        console.log(newBoard)
 
         timer.current = window.setTimeout(() => {
             runIteration();
@@ -182,7 +179,6 @@ const Cells: FunctionComponent = () => {
                 neighbors++;
             }
         }
-
         return neighbors;
     }
 
