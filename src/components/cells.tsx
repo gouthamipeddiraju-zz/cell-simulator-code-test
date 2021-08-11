@@ -53,9 +53,11 @@ const Cells: FunctionComponent = () => {
         board: getBoardData()
     })
 
-    const { rows, cols, cells, board, isRunning, interval } = state
+    const { rows, cols, cells, board, isRunning, interval, timeoutHandler } = state
 
     const divRef = useRef<HTMLDivElement>(null);
+
+    const timer = useRef(null);
 
     const cellClick = (event: any) => {
         const elemOffset = getElementOffset();
@@ -92,6 +94,101 @@ const Cells: FunctionComponent = () => {
         }
         return cells;
     }
+
+    const handleIntervalChange = (event) => {
+        setState({ interval: event.target.value });
+    };
+
+    const handleClear = () => {
+        const newBoard = getBoardData()
+        setState({ ...state, board: newBoard, cells: makeCells(newBoard) });
+    };
+
+    const newGen = () => {
+        const newBoard = [...board]
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                newBoard[y][x] = Math.random() >= 0.5;
+            }
+        }
+
+        setState({ ...state, board: newBoard, cells: makeCells(newBoard) });
+    }
+
+    const stopGame = () => {
+        setState({ ...state, isRunning: false });
+        if (timer.current) {
+            clearTimeout(timer.current);
+        }
+    };
+
+    const runGame = () => {
+        setState({ ...state, isRunning: true });
+        runIteration();
+    };
+
+
+    const runIteration = () => {
+        let newBoard = getBoardData();
+        console.log(newBoard)
+
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                let neighbors = calculateNeighbors(board, x, y);
+                if (board[y][x]) {
+                    if (neighbors === 2 || neighbors === 3) {
+                        newBoard[y][x] = true;
+                    } else {
+                        newBoard[y][x] = false;
+                    }
+                } else {
+                    if (!board[y][x] && neighbors === 3) {
+                        newBoard[y][x] = true;
+                    }
+                }
+            }
+        }
+
+        setState({
+            ...state, board: newBoard, cells: makeCells(newBoard)
+        });
+
+        timer.current = setTimeout(() => {
+            runIteration();
+        }, interval)
+    }
+
+    const calculateNeighbors = (board, x, y) => {
+        let neighbors = 0;
+        const dirs = [
+            [-1, -1],
+            [-1, 0],
+            [-1, 1],
+            [0, 1],
+            [1, 1],
+            [1, 0],
+            [1, -1],
+            [0, -1],
+        ];
+        for (let i = 0; i < dirs.length; i++) {
+            const dir = dirs[i];
+            let y1 = y + dir[0];
+            let x1 = x + dir[1];
+
+            if (
+                x1 >= 0 &&
+                x1 < cols &&
+                y1 >= 0 &&
+                y1 < rows &&
+                board[y1][x1]
+            ) {
+                neighbors++;
+            }
+        }
+
+        return neighbors;
+    }
+
     return (
         <div className="cells">
             <div className="board"
@@ -102,6 +199,29 @@ const Cells: FunctionComponent = () => {
                 {cells.map((cell: CellProps) => (
                     <Cell x={cell.x} y={cell.y} key={`${cell.x},${cell.y}`} />
                 ))}
+            </div>
+            <div className="controls">
+                Update for every{' '}
+                <input
+                    value={interval}
+                    onChange={handleIntervalChange}
+                />{" "}
+                msec
+                {isRunning ? (
+                    <button className="button" onClick={stopGame}>
+                        Stop
+                    </button>
+                ) : (
+                    <button className="button" onClick={runGame}>
+                        Run
+                    </button>
+                )}
+                <button className="button" onClick={newGen}>
+                    New generation
+                </button>
+                <button className="button" onClick={handleClear}>
+                    Clear
+                </button>
             </div>
         </div>
     );
