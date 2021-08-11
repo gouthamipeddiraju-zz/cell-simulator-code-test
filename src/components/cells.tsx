@@ -96,7 +96,7 @@ const Cells: FunctionComponent = () => {
     }
 
     const handleIntervalChange = (event) => {
-        setState({ interval: event.target.value });
+        setState({ ...state, interval: event.target.value });
     };
 
     const handleClear = () => {
@@ -118,19 +118,14 @@ const Cells: FunctionComponent = () => {
     const stopGame = () => {
         setState({ ...state, isRunning: false });
         if (timer.current) {
-            clearTimeout(timer.current);
+            window.clearTimeout(timer.current);
         }
     };
 
-    const runGame = () => {
-        setState({ ...state, isRunning: true });
-        runIteration();
-    };
-
-
     const runIteration = () => {
+        setState({ ...state, isRunning: true });
+
         let newBoard = getBoardData();
-        console.log(newBoard)
 
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
@@ -150,10 +145,12 @@ const Cells: FunctionComponent = () => {
         }
 
         setState({
-            ...state, board: newBoard, cells: makeCells(newBoard)
+            ...state, isRunning: true, board: newBoard, cells: makeCells(newBoard)
         });
+        console.log(interval)
+        console.log(newBoard)
 
-        timer.current = setTimeout(() => {
+        timer.current = window.setTimeout(() => {
             runIteration();
         }, interval)
     }
@@ -212,7 +209,7 @@ const Cells: FunctionComponent = () => {
                         Stop
                     </button>
                 ) : (
-                    <button className="button" onClick={runGame}>
+                    <button className="button" onClick={runIteration}>
                         Run
                     </button>
                 )}
