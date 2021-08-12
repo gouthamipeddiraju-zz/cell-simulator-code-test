@@ -1,4 +1,5 @@
 import { FunctionComponent, useState, useRef } from 'react';
+import { Button, Container, Row, Col} from 'react-bootstrap';
 import './cells.css'
 
 const CELL_SIZE = 20;
@@ -161,29 +162,30 @@ const Cells: FunctionComponent = () => {
     }
 
     return (
-        <div className="cells">
-            <div className="board"
-                style={{ width: WIDTH, height: HEIGHT, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px` }}
-                ref={divRef}
-                onClick={cellClick}
-            >
-                {cells.map((cell: CellProps) => (
-                    <Cell x={cell.x} y={cell.y} key={`${cell.x},${cell.y}`} />
-                ))}
+        <Container>
+            <div className="cells">
+                <div className="board"
+                    style={{ width: WIDTH, height: HEIGHT, backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px` }}
+                    ref={divRef}
+                    onClick={cellClick}
+                >
+                    {cells.map((cell: CellProps) => (
+                        <Cell x={cell.x} y={cell.y} key={`${cell.x},${cell.y}`} />
+                    ))}
+                </div>
+                <br />
+                <Row>
+                    <Col></Col>
+                    <Col>
+                        <Button variant="primary" onClick={runGame}>Run</Button> {'  '}
+                        <Button variant="success" onClick={newGen}>New generation</Button>  {'  '}
+                        <Button variant="secondary" onClick={handleClear}>Reset</Button> 
+                    </Col>
+                    <Col></Col>
+                </Row> 
             </div>
-            <div className="controls"> 
-                 
-                <button className="button" onClick={runGame}>
-                    Run
-                </button>
-                <button className="button" onClick={newGen}>
-                    New generation
-                </button>
-                <button className="button" onClick={handleClear}>
-                    Clear
-                </button>
-            </div>
-        </div>
+        </Container>
+
     );
 }
 
