@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { FunctionComponent, useState, useRef } from 'react';
 import './cells.css'
 
@@ -17,9 +15,8 @@ type CellProps = {
 interface CellsProps {
     rows: number,
     cols: number,
-    cells: Array<any | never>,
-    isRunning: boolean,
-    interval: number
+    cells: any[],
+    board:  any[]
 }
 
 const Cell = ({ x, y }: CellProps) => (
@@ -44,20 +41,16 @@ const emptyBoard = () => {
 }
 
 const Cells: FunctionComponent = () => {
-    const [state, setState] = useState({
+    const [state, setState] = useState<CellsProps>({
         rows: ROW,
         cols: COLS,
         cells: [],
-        isRunning: false,
-        interval: 1000,
         board: emptyBoard()
     })
 
-    const { rows, cols, cells, board, isRunning, interval } = state
+    const { rows, cols, cells, board } = state
 
     const divRef = useRef<HTMLDivElement>(null);
-
-    const timer = useRef(null);
 
     const cellClick = (event: any) => {
         const elemOffset = getElementOffset();
@@ -74,6 +67,7 @@ const Cells: FunctionComponent = () => {
     }
 
     const getElementOffset = () => {
+        // @ts-ignore
         const rect = divRef.current.getBoundingClientRect();
         const doc = document.documentElement;
 
@@ -83,7 +77,7 @@ const Cells: FunctionComponent = () => {
         };
     }
 
-    const makeCells = (newBoard) => {
+    const makeCells = (newBoard: any[]) => {
         let cells = [];
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
@@ -94,10 +88,6 @@ const Cells: FunctionComponent = () => {
         }
         return cells;
     }
-
-    const handleIntervalChange = (event) => {
-        setState({ ...state, interval: event.target.value });
-    };
 
     const handleClear = () => {
         const newBoard = emptyBoard()
@@ -136,11 +126,11 @@ const Cells: FunctionComponent = () => {
         }
 
         setState({
-            ...state, isRunning: true, board: newBoard, cells: makeCells(newBoard)
+            ...state,   board: newBoard, cells: makeCells(newBoard)
         });
     }
 
-    const calculateNeighbors = (board, x, y) => {
+    const calculateNeighbors = (board: any[], x: number, y: number) => {
         let neighbors = 0;
         const dirs = [
             [-1, -1],
