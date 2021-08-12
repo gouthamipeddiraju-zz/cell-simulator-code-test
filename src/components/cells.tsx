@@ -31,7 +31,7 @@ const Cell = ({ x, y }: CellProps) => (
     }} />
 )
 
-const getBoardData = () => {
+const emptyBoard = () => {
     let board: Array<any> = [];
     for (let y = 0; y < ROW; y++) {
         board[y] = [];
@@ -49,11 +49,11 @@ const Cells: FunctionComponent = () => {
         cols: COLS,
         cells: [],
         isRunning: false,
-        interval: 100,
-        board: getBoardData()
+        interval: 1000,
+        board: emptyBoard()
     })
 
-    const { rows, cols, cells, board, isRunning, interval, timeoutHandler } = state
+    const { rows, cols, cells, board, isRunning, interval } = state
 
     const divRef = useRef<HTMLDivElement>(null);
 
@@ -100,7 +100,7 @@ const Cells: FunctionComponent = () => {
     };
 
     const handleClear = () => {
-        const newBoard = getBoardData()
+        const newBoard = emptyBoard()
         setState({ ...state, board: newBoard, cells: makeCells(newBoard) });
     };
 
@@ -114,18 +114,9 @@ const Cells: FunctionComponent = () => {
 
         setState({ ...state, board: newBoard, cells: makeCells(newBoard) });
     }
-
-    const stopGame = () => {
-        setState({ ...state, isRunning: false });
-        if (timer.current) {
-            window.clearTimeout(timer.current);
-        }
-    };
-
-    const runIteration = () => {
-        setState({ ...state, board: getBoardData(), isRunning: true });
-
-        let newBoard = getBoardData();
+ 
+    const runGame = () => {
+        let newBoard = emptyBoard()
 
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
@@ -143,13 +134,10 @@ const Cells: FunctionComponent = () => {
                 }
             }
         }
+
         setState({
             ...state, isRunning: true, board: newBoard, cells: makeCells(newBoard)
         });
-
-        timer.current = window.setTimeout(() => {
-            runIteration();
-        }, interval)
     }
 
     const calculateNeighbors = (board, x, y) => {
@@ -193,22 +181,11 @@ const Cells: FunctionComponent = () => {
                     <Cell x={cell.x} y={cell.y} key={`${cell.x},${cell.y}`} />
                 ))}
             </div>
-            <div className="controls">
-                Update for every{' '}
-                <input
-                    value={interval}
-                    onChange={handleIntervalChange}
-                />{" "}
-                msec
-                {isRunning ? (
-                    <button className="button" onClick={stopGame}>
-                        Stop
-                    </button>
-                ) : (
-                    <button className="button" onClick={runIteration}>
-                        Run
-                    </button>
-                )}
+            <div className="controls"> 
+                 
+                <button className="button" onClick={runGame}>
+                    Run
+                </button>
                 <button className="button" onClick={newGen}>
                     New generation
                 </button>
